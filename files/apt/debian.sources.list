@@ -1,0 +1,18 @@
+# 
+
+# deb cdrom:[Debian GNU/Linux 6.0.6 _Squeeze_ - Official amd64 NETINST Binary-1 20120930-15:53]/ squeeze main
+
+#deb cdrom:[Debian GNU/Linux 6.0.6 _Squeeze_ - Official amd64 NETINST Binary-1 20120930-15:53]/ squeeze main
+
+deb http://ftp.us.debian.org/debian/ squeeze main
+deb-src http://ftp.us.debian.org/debian/ squeeze main
+
+# PVE packages provided by proxmox.com
+deb http://download.proxmox.com/debian squeeze pve
+
+deb http://security.debian.org/ squeeze/updates main
+deb-src http://security.debian.org/ squeeze/updates main
+
+# squeeze-updates, previously known as 'volatile'
+deb http://ftp.us.debian.org/debian/ squeeze-updates main
+deb-src http://ftp.us.debian.org/debian/ squeeze-updates main

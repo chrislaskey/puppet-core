@@ -1,0 +1,7 @@
+name 'core'
+version '1.0.0'
+author 'Chris Laskey'
+summary 'Core configuration and packages for Debian and Ubuntu servers.'
+description 'Core configuration and packages for Debian and Ubuntu servers.'
+license 'MIT License (http://opensource.org/licenses/MIT)'
+project_page 'http://github.com/chrislaskey'
