@@ -24,14 +24,8 @@ class core {
 	#		group => "root",
 	#	 }
 
-	# TODO: Multiverse is not being updated prior to installing packages. Works
-	# on second run. This "Package" level require may not work as expected
-
 	Package {
 		ensure => "present",
-		require => [
-			Exec["apt-get-update-after-adding-multiverse-source"],
-		],
 	}
 
 	# Packages
@@ -61,7 +55,6 @@ class core {
 			"apt-file",
 			"python-software-properties",
 		],
-		require => [], # Prevent circular dependency (see Package above)
 	}
 
 	package { "acpi": }
@@ -230,20 +223,6 @@ class core {
 	#	require => Package["sudo"],
 	# }
 
-	file { "/etc/apt/sources.list":
-		ensure => "present",
-		source => $operatingsystem ? {
-			Ubuntu => "puppet:///modules/core/apt/ubuntu.sources.list",
-			Debian => "puppet:///modules/core/apt/debian.sources.list",
-		},
-		owner => "root",
-		group => "root",
-		mode => "0644",
-		require => [
-			Package["apt"],
-		],
-	}
-
 	file { "/etc/ssh/sshd_config":
 		ensure => "present",
 		source => "puppet:///modules/core/ssh/sshd_config",
@@ -323,34 +302,6 @@ class core {
 			File["/etc/ssh/sshd_config"],
 		],
 	}
-
-	exec { "apt-get-update-after-adding-multiverse-source":
-		command => "apt-get update",
-		path => "/bin:/sbin:/usr/bin:/usr/sbin",
-		user => "root",
-		group => "root",
-		refreshonly => "true",
-		logoutput => "on_failure",
-		subscribe => [
-			File["/etc/apt/sources.list"],
-		],
-	}
-
-	# Users
-	# ==========================================================================
-
-	# user { "daemon":
-	#	home => "/sbin",
-	#	password_min_age => "0",
-	#	ensure => "present",
-	#	uid => "2",
-	#	shell => "/sbin/nologin",
-	#	password_max_age => "99999",
-	#	password => "*",
-	#	gid => "2",
-	#	groups => ["bin","daemon","adm","lp"],
-	#	comment => "daemon"
-	# }
 
 	# Groups
 	# ==========================================================================
