@@ -157,6 +157,8 @@ class core {
 		ensure => "latest",
 	}
 
+	package { "unzip": }
+
 	package { "vim":
 		ensure => "latest",
 	}
