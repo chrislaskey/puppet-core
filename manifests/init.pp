@@ -1,4 +1,6 @@
-class core {
+class core (
+	$ssh_port = 2222,
+){
 
 	# Module classes
 	# ==========================================================================
@@ -227,7 +229,7 @@ class core {
 
 	file { "/etc/ssh/sshd_config":
 		ensure => "present",
-		source => "puppet:///modules/core/ssh/sshd_config",
+		content => template("core/sshd_config"),
 		owner => "root",
 		group => "root",
 		mode => "0640",
