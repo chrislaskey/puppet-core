@@ -1,5 +1,5 @@
 class core (
-	$ssh_port = 2222,
+	$ssh_port = 22,
 ){
 
 	# Module classes
