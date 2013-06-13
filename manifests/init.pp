@@ -104,7 +104,7 @@ class core (
 
 	package { "mailutils": }
 
-	package { "mercurial": }
+	# package { "mercurial": }
 
 	if $operatingsystem == "Ubuntu" {
 		package { "mosh":
@@ -121,8 +121,6 @@ class core (
 			ensure => "latest",
 		 }
 	}
-
-	package { "puppet": }
 
 	package { "pv": }
 
@@ -177,7 +175,6 @@ class core (
 		enable => true,
 		subscribe => [
 			File["puppet"],
-			Package["puppet"],
 		],
 	}
 
@@ -255,9 +252,6 @@ class core (
 		owner => "root",
 		group => "root",
 		mode => "0664",
-		require => [
-			Package["puppet"],
-		],
 	}
 
 	file { "/etc/default/puppet":
@@ -266,9 +260,6 @@ class core (
 		owner => "root",
 		group => "root",
 		mode => "0644",
-		require => [
-			Package["puppet"],
-		],
 	}
 
 	if ! defined( File["/data"] ){
