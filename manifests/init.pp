@@ -51,14 +51,6 @@ class core (
 	# Listed separately instead of an array so individual options can be set
 	# per package
 
-	package { "apt":
-		name => [
-			"apt",
-			"apt-file",
-			"python-software-properties",
-		],
-	}
-
 	package { "acpi": }
 
 	package { "bash":
@@ -84,7 +76,11 @@ class core (
 	package { "grep":
 		name => [
 			"grep",
-			"ack-grep",
+			$operatingsystem ? {
+				/(Ubuntu|Debian)/ => "ack-grep",
+				/(CentOS|RedHat|Scientific)/ => "ack",
+				default => "",
+			},
 		],
 	}
 
@@ -94,33 +90,27 @@ class core (
 
 	package { "iftop": }
 
-	if ! defined( Package["iptables-persistent"] ){
-		package { "iptables-persistent": }
-	}
-
 	package { "logwatch": }
 
 	package { "make": }
 
-	package { "mailutils": }
-
-	# package { "mercurial": }
-
-	if $operatingsystem == "Ubuntu" {
-		package { "mosh":
-			ensure => "latest",
-		}
-	}
-
 	package { "nmap": }
 
-	package { "ntpdate": }
+	package { "ntp":
+		name => $operatingsystem ? { 
+			/(Ubuntu|Debian)/ => "ntpdate",
+			/(CentOS|RedHat|Scientific)/ => "ntp",
+			default => "",
+		},
+	}
 
 	if ! defined( Package["perl"] ){
-		package { "perl": 
+		package { "perl":
 			ensure => "latest",
 		 }
 	}
+
+	package { "puppet": }
 
 	package { "pv": }
 
@@ -131,7 +121,7 @@ class core (
 	}
 
 	if ! defined( Package["ruby"] ){
-		package { "ruby": 
+		package { "ruby":
 			ensure => "latest",
 		 }
 	}
@@ -140,12 +130,22 @@ class core (
 
 	package { "ssh":
 		name => [
-			"openssh-client",
+			$operatingsystem ? { 
+				/(Ubuntu|Debian)/ => "openssh-client",
+				/(CentOS|RedHat|Scientific)/ => "openssh-clients",
+				default => "",
+			},
 			"openssh-server",
 		],
 	}
 
-	package { "sqlite3": }
+	package { "sqlite":
+		name => $operatingsystem ? { 
+			/(Ubuntu|Debian)/ => "sqlite3",
+			/(CentOS|RedHat|Scientific)/ => "sqlite",
+			default => "",
+		},
+	}
 
 	package { "sudo": }
 
@@ -160,12 +160,46 @@ class core (
 	package { "unzip": }
 
 	package { "vim":
+		name => $operatingsystem ? {
+					/(Ubuntu|Debian)/ => "vim",
+					/(CentOS|RedHat|Scientific)/ => "vim-enhanced",
+					default => "",
+				},
 		ensure => "latest",
 	}
 
 	package { "wget": }
 
 	package { "zsh": }
+
+	# Distribution specific packages
+	# ==========================================================================
+
+	if $operatingsystem =~ /(Ubuntu|Debian)/ {
+
+		package { "apt":
+			name => [
+				"apt",
+				"apt-file",
+				"python-software-properties",
+			],
+		}
+
+		if ! defined( Package["iptables-persistent"] ){
+			package { "iptables-persistent": }
+		}
+
+		package { "mailutils": }
+
+		package { "mosh":
+			ensure => "latest",
+		}
+
+	}
+
+	if $operatingsystem != Debian {
+		package { "mercurial": }
+	}
 
 	# Service
 	# ==========================================================================
@@ -286,8 +320,14 @@ class core (
 	# Execs
 	# ==========================================================================
 
+	$ssh_service = $operatingsystem ? { 
+		/(Ubuntu|Debian)/ => "ssh",
+		/(CentOS|RedHat|Scientific)/ => "sshd",
+		default => "ssh",
+	}
+
 	exec { "ssh-service-restart":
-		command => "service ssh restart",
+		command => "service ${ssh_service} restart",
 		path => "/bin:/sbin:/usr/bin:/usr/sbin",
 		user => "root",
 		group => "root",
@@ -303,12 +343,6 @@ class core (
 
 	group { "sudo":
 		ensure => "present",
-	}
-
-	if $operatingsystem == "Debian" {
-		group { "admin":
-			ensure => "present",
-		}
 	}
 
 }
