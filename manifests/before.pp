@@ -7,7 +7,10 @@ class core::before {
 		ensure => "present",
 		source => $operatingsystem ? {
 			Ubuntu => "puppet:///modules/core/apt/ubuntu.sources.list",
-			Debian => "puppet:///modules/core/apt/debian.sources.list",
+			Debian => $lsbdistcodename ? {
+				wheezy => "puppet:///modules/core/apt/debian-wheezy.sources.list",
+				squeeze => "puppet:///modules/core/apt/debian-squeeze.sources.list",
+		  	},
 		},
 		owner => "root",
 		group => "root",
