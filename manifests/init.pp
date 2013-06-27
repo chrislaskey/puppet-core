@@ -210,6 +210,9 @@ class core (
 		subscribe => [
 			File["puppet"],
 		],
+		require => [
+			Package["puppet"],
+		]
 	}
 
 	service { "ssh":
@@ -286,6 +289,9 @@ class core (
 		owner => "root",
 		group => "root",
 		mode => "0664",
+		require => [
+			Package["puppet"],
+		]
 	}
 
 	file { "/etc/default/puppet":
@@ -294,6 +300,9 @@ class core (
 		owner => "root",
 		group => "root",
 		mode => "0644",
+		require => [
+			Package["puppet"],
+		]
 	}
 
 	if ! defined( File["/data"] ){
