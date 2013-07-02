@@ -14,3 +14,6 @@ deb-src http://ftp.us.debian.org/debian/ wheezy-updates main
 
 # Added non-free repo, includes packages like Apache mod-fastcgi
 deb http://ftp.de.debian.org/debian wheezy main non-free
+
+# Added backports for Zabbix support on Wheezy
+deb http://ftp.debian.org/debian wheezy-backports main contrib non-free
