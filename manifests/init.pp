@@ -65,8 +65,6 @@ class core (
 
 	package { "curl": }
 
-	package { "etckeeper": }
-
 	package { "fail2ban": }
 
 	package { "git":
@@ -109,8 +107,6 @@ class core (
 			ensure => "latest",
 		 }
 	}
-
-	package { "puppet": }
 
 	package { "pv": }
 
@@ -204,17 +200,6 @@ class core (
 	# Service
 	# ==========================================================================
 
-	service { "puppet":
-		ensure => running,
-		enable => true,
-		subscribe => [
-			File["puppet"],
-		],
-		require => [
-			Package["puppet"],
-		]
-	}
-
 	service { "ssh":
 		ensure => running,
 		enable => true,
@@ -283,26 +268,12 @@ class core (
 		mode => "0640",
 	}
 
-	file { "puppet":
-		path => "/etc/puppet/puppet.conf",
-		ensure => "present",
-		owner => "root",
-		group => "root",
-		mode => "0664",
-		require => [
-			Package["puppet"],
-		]
-	}
-
 	file { "/etc/default/puppet":
 		ensure => "present",
 		source => "puppet:///modules/core/puppet/etc-default-puppet",
 		owner => "root",
 		group => "root",
 		mode => "0644",
-		require => [
-			Package["puppet"],
-		]
 	}
 
 	if ! defined( File["/data"] ){
