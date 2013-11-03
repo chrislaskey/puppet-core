@@ -238,8 +238,8 @@ class core (
 		host { "puppet":
 			ensure => "present",
 			target => "/etc/hosts",
-			ip => "$puppetmaster_ip",
-			host_aliases => [ $puppetmaster_fqdn ],
+			ip => "$::serverip", #puppetmaster ip
+			host_aliases => [ $::servername ], #puppetmaster fqdn
 		}
 	}
 
