@@ -1,30 +1,12 @@
-class core (
-	$ssh_port = 22,
-){
+class core {
 
 	# Module classes
 	# ==========================================================================
 
 	class{ "core::params": }
 
-	# Class defaults
+	# Resource defaults
 	# ==========================================================================
-
-	# Package defaults example:
-	#	Package { ensure => present, }
-	#
-	#	Makes individual package declarations:
-	#		package { sudo: }
-	#
-	#	Equivalent to:
-	#		package { sudo: ensure => present}
-
-	# File defaults example:
-	#	File {
-	#		mode  => "0644",
-	#		owner => "root",
-	#		group => "root",
-	#	 }
 
 	Package {
 		ensure => "present",
@@ -32,21 +14,6 @@ class core (
 
 	# Packages
 	# ==========================================================================
-
-	# Example of OS-independent packages:
-	#	package { "ssh":
-	#		name => $operatingsystem ? {
-	#			/(Ubuntu|Debian)/ => "openssh-server",
-	#			Solaris => "openssh",
-	#			default => "ssh",
-	#		}
-	#		ensure => "installed",
-	#	}
-	# Note: default line is optional. Will be set to nil if no matches are
-	# found and no default is supplied.
-	#
-	# This is good for the occaisional check. See params class for an
-	# alternate example that centralizes OS checks.
 
 	# Listed separately instead of an array so individual options can be set
 	# per package
@@ -95,7 +62,7 @@ class core (
 	package { "nmap": }
 
 	package { "ntp":
-		name => $operatingsystem ? { 
+		name => $operatingsystem ? {
 			/(Ubuntu|Debian)/ => "ntpdate",
 			/(CentOS|RedHat|Scientific)/ => "ntp",
 			default => "",
@@ -124,19 +91,8 @@ class core (
 
 	package { "rsync": }
 
-	package { "ssh":
-		name => [
-			$operatingsystem ? { 
-				/(Ubuntu|Debian)/ => "openssh-client",
-				/(CentOS|RedHat|Scientific)/ => "openssh-clients",
-				default => "",
-			},
-			"openssh-server",
-		],
-	}
-
 	package { "sqlite":
-		name => $operatingsystem ? { 
+		name => $operatingsystem ? {
 			/(Ubuntu|Debian)/ => "sqlite3",
 			/(CentOS|RedHat|Scientific)/ => "sqlite",
 			default => "",
@@ -197,18 +153,6 @@ class core (
 		package { "mercurial": }
 	}
 
-	# Service
-	# ==========================================================================
-
-	service { "ssh":
-		ensure => running,
-		enable => true,
-		pattern => "sshd",
-		require => [
-			Package["ssh"],
-		],
-	}
-
 	# Host file entries
 	# ==========================================================================
 
@@ -245,14 +189,6 @@ class core (
 	#	source => puppet:///modules/ubuntu/sudoers",
 	#	require => Package["sudo"],
 	# }
-
-	file { "/etc/ssh/sshd_config":
-		ensure => "present",
-		content => template("core/sshd_config"),
-		owner => "root",
-		group => "root",
-		mode => "0640",
-	}
 
 	file { "/etc/shadow":
 		ensure => "present",
@@ -295,27 +231,6 @@ class core (
 				File["/data"],
 			],
 		}
-	}
-
-	# Execs
-	# ==========================================================================
-
-	$ssh_service = $operatingsystem ? { 
-		/(Ubuntu|Debian)/ => "ssh",
-		/(CentOS|RedHat|Scientific)/ => "sshd",
-		default => "ssh",
-	}
-
-	exec { "ssh-service-restart":
-		command => "service ${ssh_service} restart",
-		path => "/bin:/sbin:/usr/bin:/usr/sbin",
-		user => "root",
-		group => "root",
-		refreshonly => "true",
-		logoutput => "on_failure",
-		subscribe => [
-			File["/etc/ssh/sshd_config"],
-		],
 	}
 
 	# Groups
