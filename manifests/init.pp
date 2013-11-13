@@ -30,8 +30,6 @@ class core {
 
 	package { "bzip2": }
 
-	package { "curl": }
-
 	package { "fail2ban": }
 
 	package { "git":
@@ -57,8 +55,6 @@ class core {
 
 	package { "logwatch": }
 
-	package { "make": }
-
 	package { "nmap": }
 
 	package { "ntp":
@@ -76,12 +72,6 @@ class core {
 	}
 
 	package { "pv": }
-
-	if ! defined( Package["python"] ){
-		package { "python":
-			ensure => "latest",
-		 }
-	}
 
 	if ! defined( Package["ruby"] ){
 		package { "ruby":
@@ -123,6 +113,13 @@ class core {
 	package { "wget": }
 
 	package { "zsh": }
+	
+	# Stdlib ensure packages
+	# --------------------------------------------------------------------------
+	# Use Puppet Stdlib module method "ensure_packages" to prevent "package
+	# already defined" conflicts with other modules.
+
+	ensure_packages(["curl", "make", "python"])
 
 	# Distribution specific packages
 	# ==========================================================================
