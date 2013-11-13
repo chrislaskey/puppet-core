@@ -113,7 +113,7 @@ class core {
 	package { "wget": }
 
 	package { "zsh": }
-	
+
 	# Stdlib ensure packages
 	# --------------------------------------------------------------------------
 	# Use Puppet Stdlib module method "ensure_packages" to prevent "package
@@ -122,7 +122,7 @@ class core {
 	ensure_packages(["curl", "make", "python"])
 
 	# Distribution specific packages
-	# ==========================================================================
+	# --------------------------------------------------------------------------
 
 	if $operatingsystem =~ /(Ubuntu|Debian)/ {
 
@@ -153,39 +153,16 @@ class core {
 	# Host file entries
 	# ==========================================================================
 
-	# host { "localhost.localdomain":
-	#	ensure => "present",
-	#	target => "/etc/hosts",
-	#	ip => "127.0.0.1",
-	#	host_aliases => ["localhost","puppet"],
-	# }
-
-	if $puppetmaster_ip != "" {
-		host { "puppet":
-			ensure => "present",
-			target => "/etc/hosts",
-			ip => "$::serverip", #puppetmaster ip
-			host_aliases => [ $::servername ], #puppetmaster fqdn
-		}
+	host { "puppet":
+		ensure => "present",
+		target => "/etc/hosts",
+		ip => "$::serverip", #puppetmaster ip
+		host_aliases => [ $::servername ], #puppetmaster fqdn
 	}
 
 	# Files
 	# ==========================================================================
 	# Note: the "files" dir is ommitted when using puppet:///.
-
-	# Note about sudo:
-	# Ubuntu relies on a "sudo" group instead of managing the /etc/sudoers
-	# entry. Changes to the /etc/sudoers file still work, but the distro
-	# preferred method would be to use puppet group {} declarations.
-	#
-	# Instead of adding a custom sudoers file as outlined below.
-	# file { "/etc/sudoers":
-	#	owner => "root",
-	#	group => "root",
-	#	mode => "0440",
-	#	source => puppet:///modules/ubuntu/sudoers",
-	#	require => Package["sudo"],
-	# }
 
 	file { "/etc/shadow":
 		ensure => "present",
@@ -209,6 +186,15 @@ class core {
 		mode => "0644",
 	}
 
+	file { "/etc/puppet/puppet.conf":
+		ensure => "present",
+		source => "puppet:///modules/core/puppet/puppet.conf",
+		owner => "root",
+		group => "root",
+		mode => "0644",
+		notify => Service["puppet"],
+	}
+
 	if ! defined( File["/data"] ){
 		file { "/data":
 			ensure => "directory",
@@ -229,6 +215,14 @@ class core {
 			],
 		}
 	}
+
+	# Services
+	# ==========================================================================
+
+	service { "puppet":
+		ensure => "running",
+		enable => true,
+  	}
 
 	# Groups
 	# ==========================================================================
