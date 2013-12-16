@@ -192,7 +192,7 @@ class core {
 		owner => "root",
 		group => "root",
 		mode => "0644",
-		notify => Service["puppet"],
+		# notify => Service["puppet"],
 	}
 
 	if ! defined( File["/data"] ){
@@ -219,10 +219,10 @@ class core {
 	# Services
 	# ==========================================================================
 
-	service { "puppet":
-		ensure => "running",
-		enable => true,
-  	}
+	# service { "puppet":
+	# 	ensure => "running",
+	# 	enable => true,
+  	# }
 
 	# Groups
 	# ==========================================================================
