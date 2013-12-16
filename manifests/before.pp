@@ -22,7 +22,6 @@ class core::before {
       exec { 'update-package-list':
         command => 'apt-get update',
         path => '/bin:/sbin:/usr/bin:/usr/sbin',
-        refreshonly => 'true',
         logoutput => 'on_failure',
         subscribe => [
           File['/etc/apt/sources.list'],
@@ -33,7 +32,6 @@ class core::before {
       exec { 'update-package-list':
         command => 'yum update',
         path => '/bin:/sbin:/usr/bin:/usr/sbin',
-        refreshonly => 'true',
         logoutput => 'on_failure',
       }
     }
