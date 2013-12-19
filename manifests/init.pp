@@ -81,6 +81,8 @@ class core {
 
 	package { "rsync": }
 
+	package { "smartmontools": }
+
 	package { "sqlite":
 		name => $operatingsystem ? {
 			/(Ubuntu|Debian)/ => "sqlite3",
