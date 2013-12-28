@@ -1,236 +1,230 @@
 class core {
 
-	# Module classes
-	# ==========================================================================
+  # Resource defaults
+  # ==========================================================================
 
-	class{ "core::params": }
+  Package {
+    ensure => 'present',
+  }
 
-	# Resource defaults
-	# ==========================================================================
+  # Packages
+  # ==========================================================================
 
-	Package {
-		ensure => "present",
-	}
+  # Listed separately instead of an array so individual options can be set
+  # per package
 
-	# Packages
-	# ==========================================================================
+  package { 'acpi': }
 
-	# Listed separately instead of an array so individual options can be set
-	# per package
+  package { 'bash':
+    ensure => 'latest',
+  }
 
-	package { "acpi": }
+  package { 'bash-completion':
+    ensure => 'latest',
+  }
 
-	package { "bash":
-		ensure => "latest",
-	}
+  package { 'bzip2': }
 
-	package { "bash-completion":
-		ensure => "latest",
-	}
+  package { 'fail2ban': }
 
-	package { "bzip2": }
+  package { 'git':
+    ensure => 'latest',
+  }
 
-	package { "fail2ban": }
+  package { 'grep':
+    name => [
+      'grep',
+      $operatingsystem ? {
+        /(Ubuntu|Debian)/ => 'ack-grep',
+        /(CentOS|RedHat|Scientific)/ => 'ack',
+        default => '',
+      },
+    ],
+  }
 
-	package { "git":
-		ensure => "latest",
-	}
+  package { 'gzip': }
 
-	package { "grep":
-		name => [
-			"grep",
-			$operatingsystem ? {
-				/(Ubuntu|Debian)/ => "ack-grep",
-				/(CentOS|RedHat|Scientific)/ => "ack",
-				default => "",
-			},
-		],
-	}
+  package { 'htop': }
 
-	package { "gzip": }
+  package { 'iftop': }
 
-	package { "htop": }
+  package { 'logwatch': }
 
-	package { "iftop": }
+  package { 'nmap': }
 
-	package { "logwatch": }
+  package { 'ntp':
+    name => $operatingsystem ? {
+      /(Ubuntu|Debian)/ => 'ntpdate',
+      /(CentOS|RedHat|Scientific)/ => 'ntp',
+      default => '',
+    },
+  }
 
-	package { "nmap": }
+  if ! defined( Package['perl'] ){
+    package { 'perl':
+      ensure => 'latest',
+     }
+  }
 
-	package { "ntp":
-		name => $operatingsystem ? {
-			/(Ubuntu|Debian)/ => "ntpdate",
-			/(CentOS|RedHat|Scientific)/ => "ntp",
-			default => "",
-		},
-	}
+  package { 'pv': }
 
-	if ! defined( Package["perl"] ){
-		package { "perl":
-			ensure => "latest",
-		 }
-	}
+  if ! defined( Package['ruby'] ){
+    package { 'ruby':
+      ensure => 'latest',
+     }
+  }
 
-	package { "pv": }
+  package { 'rsync': }
 
-	if ! defined( Package["ruby"] ){
-		package { "ruby":
-			ensure => "latest",
-		 }
-	}
+  package { 'smartmontools': }
 
-	package { "rsync": }
+  package { 'sqlite':
+    name => $operatingsystem ? {
+      /(Ubuntu|Debian)/ => 'sqlite3',
+      /(CentOS|RedHat|Scientific)/ => 'sqlite',
+      default => '',
+    },
+  }
 
-	package { "smartmontools": }
+  package { 'sudo': }
 
-	package { "sqlite":
-		name => $operatingsystem ? {
-			/(Ubuntu|Debian)/ => "sqlite3",
-			/(CentOS|RedHat|Scientific)/ => "sqlite",
-			default => "",
-		},
-	}
+  package { 'tcpdump': }
 
-	package { "sudo": }
+  package { 'tcsh': }
 
-	package { "tcpdump": }
+  package { 'tmux':
+    ensure => 'latest',
+  }
 
-	package { "tcsh": }
+  package { 'unzip': }
 
-	package { "tmux":
-		ensure => "latest",
-	}
+  package { 'vim':
+    name => $operatingsystem ? {
+          /(Ubuntu|Debian)/ => 'vim',
+          /(CentOS|RedHat|Scientific)/ => 'vim-enhanced',
+          default => '',
+        },
+    ensure => 'latest',
+  }
 
-	package { "unzip": }
+  package { 'wget': }
 
-	package { "vim":
-		name => $operatingsystem ? {
-					/(Ubuntu|Debian)/ => "vim",
-					/(CentOS|RedHat|Scientific)/ => "vim-enhanced",
-					default => "",
-				},
-		ensure => "latest",
-	}
+  package { 'zsh': }
 
-	package { "wget": }
+  # Stdlib ensure packages
+  # --------------------------------------------------------------------------
+  # Use Puppet Stdlib module method 'ensure_packages' to prevent 'package
+  # already defined' conflicts with other modules.
 
-	package { "zsh": }
+  ensure_packages(['curl', 'make', 'python'])
 
-	# Stdlib ensure packages
-	# --------------------------------------------------------------------------
-	# Use Puppet Stdlib module method "ensure_packages" to prevent "package
-	# already defined" conflicts with other modules.
+  # Distribution specific packages
+  # --------------------------------------------------------------------------
 
-	ensure_packages(["curl", "make", "python"])
+  if $operatingsystem =~ /(Ubuntu|Debian)/ {
 
-	# Distribution specific packages
-	# --------------------------------------------------------------------------
+    package { 'apt':
+      name => [
+        'apt',
+        'apt-file',
+        'python-software-properties',
+      ],
+    }
 
-	if $operatingsystem =~ /(Ubuntu|Debian)/ {
+    if ! defined( Package['iptables-persistent'] ){
+      package { 'iptables-persistent': }
+    }
 
-		package { "apt":
-			name => [
-				"apt",
-				"apt-file",
-				"python-software-properties",
-			],
-		}
+    package { 'mailutils': }
 
-		if ! defined( Package["iptables-persistent"] ){
-			package { "iptables-persistent": }
-		}
+    package { 'mosh':
+      ensure => 'latest',
+    }
 
-		package { "mailutils": }
+  }
 
-		package { "mosh":
-			ensure => "latest",
-		}
+  if $operatingsystem != Debian {
+    package { 'mercurial': }
+  }
 
-	}
+  # Host file entries
+  # ==========================================================================
 
-	if $operatingsystem != Debian {
-		package { "mercurial": }
-	}
+  host { 'puppet':
+    ensure       => 'present',
+    target       => '/etc/hosts',
+    ip           => $::serverip, #puppetmaster ip
+    host_aliases => [ $::servername ], #puppetmaster fqdn
+  }
 
-	# Host file entries
-	# ==========================================================================
+  # Files
+  # ==========================================================================
+  # Note: the 'files' dir is ommitted when using puppet:///.
 
-	host { "puppet":
-		ensure => "present",
-		target => "/etc/hosts",
-		ip => "$::serverip", #puppetmaster ip
-		host_aliases => [ $::servername ], #puppetmaster fqdn
-	}
+  file { '/etc/shadow':
+    ensure => 'present',
+    owner  => 'root',
+    group  => 'shadow',
+    mode   => '0640',
+  }
 
-	# Files
-	# ==========================================================================
-	# Note: the "files" dir is ommitted when using puppet:///.
+  file { '/etc/gshadow':
+    ensure => 'present',
+    owner  => 'root',
+    group  => 'shadow',
+    mode   => '0640',
+  }
 
-	file { "/etc/shadow":
-		ensure => "present",
-		owner => "root",
-		group => "shadow",
-		mode => "0640",
-	}
+  file { '/etc/default/puppet':
+    ensure => 'present',
+    source => 'puppet:///modules/core/puppet/etc-default-puppet',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+  }
 
-	file { "/etc/gshadow":
-		ensure => "present",
-		owner => "root",
-		group => "shadow",
-		mode => "0640",
-	}
+  file { '/etc/puppet/puppet.conf':
+    ensure   => 'present',
+    source   => 'puppet:///modules/core/puppet/puppet.conf',
+    owner    => 'root',
+    group    => 'root',
+    mode     => '0644',
+  }
 
-	file { "/etc/default/puppet":
-		ensure => "present",
-		source => "puppet:///modules/core/puppet/etc-default-puppet",
-		owner => "root",
-		group => "root",
-		mode => "0644",
-	}
+  if ! defined( File['/data'] ){
+    file { '/data':
+      ensure => 'directory',
+      owner  => 'root',
+      group  => 'puppet',
+      mode   => '0775',
+    }
+  }
 
-	file { "/etc/puppet/puppet.conf":
-		ensure => "present",
-		source => "puppet:///modules/core/puppet/puppet.conf",
-		owner => "root",
-		group => "root",
-		mode => "0644",
-		# notify => Service["puppet"],
-	}
+  # TODO: Change all submodules that use /data/puppet to use /etc/puppet/scripts
+  if ! defined( File['/data/puppet'] ){
+    file { '/data/puppet':
+      ensure  => 'directory',
+      owner   => 'root',
+      group   => 'puppet',
+      mode    => '0700',
+      require => File['/data'],
+    }
+  }
 
-	if ! defined( File["/data"] ){
-		file { "/data":
-			ensure => "directory",
-			owner => "root",
-			group => "puppet",
-			mode => "0775",
-		}
-	}
+  # Services
+  # ==========================================================================
 
-	if ! defined( File["/data/puppet"] ){
-		file { "/data/puppet":
-			ensure => "directory",
-			owner => "root",
-			group => "puppet",
-			mode => "0700",
-			require => [
-				File["/data"],
-			],
-		}
-	}
+  # service { 'puppet':
+  #   ensure => 'running',
+  #   enable => true,
+    # }
 
-	# Services
-	# ==========================================================================
+  # Groups
+  # ==========================================================================
 
-	# service { "puppet":
-	# 	ensure => "running",
-	# 	enable => true,
-  	# }
-
-	# Groups
-	# ==========================================================================
-
-	group { "sudo":
-		ensure => "present",
-	}
+  # TODO: Deprecated
+  #  group { 'sudo':
+  #  ensure => 'present',
+  # }
 
 }
