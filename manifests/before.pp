@@ -10,28 +10,26 @@ class core::before {
         source => $operatingsystem ? {
           Ubuntu => 'puppet:///modules/core/apt/ubuntu.sources.list',
           Debian => $lsbdistcodename ? {
-            wheezy => 'puppet:///modules/core/apt/debian-wheezy.sources.list',
+            wheezy  => 'puppet:///modules/core/apt/debian-wheezy.sources.list',
             squeeze => 'puppet:///modules/core/apt/debian-squeeze.sources.list',
           },
         },
         owner => 'root',
         group => 'root',
-        mode => '0644',
+        mode  => '0644',
       }
 
       exec { 'update-package-list':
-        command => 'apt-get update',
-        path => '/bin:/sbin:/usr/bin:/usr/sbin',
+        command   => 'apt-get update',
+        path      => '/bin:/sbin:/usr/bin:/usr/sbin',
         logoutput => 'on_failure',
-        subscribe => [
-          File['/etc/apt/sources.list'],
-        ],
+        subscribe => File['/etc/apt/sources.list'],
       }
     }
     'RedHat': {
       exec { 'update-package-list':
-        command => 'yum update',
-        path => '/bin:/sbin:/usr/bin:/usr/sbin',
+        command   => 'yum update',
+        path      => '/bin:/sbin:/usr/bin:/usr/sbin',
         logoutput => 'on_failure',
       }
     }
