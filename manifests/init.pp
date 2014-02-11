@@ -15,6 +15,15 @@ class core {
 
   package { 'acpi': }
 
+  package { 'ack':
+    name => 
+      $operatingsystem ? {
+        /(Ubuntu|Debian)/ => 'ack-grep',
+        /(CentOS|RedHat|Scientific)/ => 'ack',
+        default => '',
+      },
+  }
+
   package { 'bash':
     ensure => 'latest',
   }
@@ -31,16 +40,7 @@ class core {
     ensure => 'latest',
   }
 
-  package { 'grep':
-    name => [
-      'grep',
-      $operatingsystem ? {
-        /(Ubuntu|Debian)/ => 'ack-grep',
-        /(CentOS|RedHat|Scientific)/ => 'ack',
-        default => '',
-      },
-    ],
-  }
+  package { 'grep': }
 
   package { 'gzip': }
 
@@ -116,20 +116,16 @@ class core {
   # Use Puppet Stdlib module method 'ensure_packages' to prevent 'package
   # already defined' conflicts with other modules.
 
-  ensure_packages(['curl', 'make', 'python'])
+  ensure_packages(['curl', 'make', 'python', 'iperf'])
 
   # Distribution specific packages
   # --------------------------------------------------------------------------
 
   if $operatingsystem =~ /(Ubuntu|Debian)/ {
 
-    package { 'apt':
-      name => [
-        'apt',
-        'apt-file',
-        'python-software-properties',
-      ],
-    }
+    package { 'apt': }
+    package { 'apt-file': }
+    package { 'python-software-properties': }
 
     if ! defined( Package['iptables-persistent'] ){
       package { 'iptables-persistent': }
